@@ -128,7 +128,10 @@ static void play_active_video() {
 			perror("popen: popen() failed");
 		}
 
-		char* res = fgets(omx_status, 1024, stream);
+		while(fgets(omx_status, 1024, stream)){
+
+		}
+
 
 		ret = pclose(stream);
 		printf("(ls returned %d.)\n", ret);
