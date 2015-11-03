@@ -5,7 +5,7 @@ var curSlideIdx;
 var hash = location.hash.substr(1);
 if(hash == "autoplay"){
 	curSlideIdx = 0;	
-	setInterval(nextSlideStep, 10000);
+	setInterval(nextSlideStep, 3000);
 }
 else{
 	curSlideIdx = parseInt(location.hash.substr(1)) | 0;	
