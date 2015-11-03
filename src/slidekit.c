@@ -99,9 +99,32 @@ static void play_active_video(){
 
 		//-fullscreen -maximized
 		//
+
+
+
+
+
 		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
 		popen(invocation, "r");
 		
+		sleep(1);
+
+		gchar* dbusInvocation = "./dbuscontrolm.sh org.mpris.MediaPlayer2.omxplayer status";
+
+		int status;
+		FILE* stream;
+		char buffer[40];
+
+		if((stream = popen(dbusInvocation, "r")) == NULL){
+			perror("popen() failed on dbusInvocation");
+		}
+
+		while(fgets(buffer, 40, stream) != NULL){
+			if(buffer[strlen(buffer)] - 2 == '/'){
+				printf("%s", buffer);
+			}
+		}
+
 		
 		//execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 
