@@ -37,7 +37,9 @@ static gboolean no_autoplay = false;
 static gboolean smooth_scrolling = false;
 static gboolean fullscreen_enabled = false;
 
+char base_path[512];
 char* base_uri;
+
 static WebKitWebView* web_view;
 
 static pid_t xterm_pid;
@@ -303,6 +305,7 @@ void determine_base_uri(char* url){
 	base_uri = (char *) malloc((lastSlashIdx + 1) * sizeof(char));
 	memcpy(base_uri, url, lastSlashIdx);
 	base_uri[lastSlashIdx + 1] = '\0';
+
 }
 
 int main(int argc, char* argv[]) {
@@ -319,15 +322,23 @@ int main(int argc, char* argv[]) {
 			cwd = getcwd(buf, (size_t) size);
 		}
 
+		strcpy(base_path, cwd);
+		strcat(base_path, "/web");
+
 		char buf2[512];
 		strcpy(buf2, "file://");
-		strcat(buf2, cwd);
-		strcat(buf2, "/web/slidekit.html#autoplay");
+		strcat(buf2, base_path);
+		strcat(buf2, "/slidekit.html#autoplay");
 
 		url = buf2;
+
+		printf("url: %s\n", url);
 	}
 
 	determine_base_uri(url);
+
+	printf("base_path: %s\n", base_path);
+	printf("base_url: %s\n", base_uri);
 
 	gtk_init(&argc, &argv);
 
