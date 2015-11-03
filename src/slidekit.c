@@ -60,8 +60,6 @@ static void toggleOmx(GtkWidget* item, WebKitWebView* webView) {
 //		execvp("omxplayer", execArgs);
 //	}
 
-
-
 //	int pid = fork();
 
 //	execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
@@ -76,19 +74,19 @@ static void reload(GtkWidget* item, WebKitWebView* webView) {
 
 static void toggle_fullscreen(GtkWidget* window, WebKitWebView* webView) {
 	fullscreen_enabled = !fullscreen_enabled;
-	if(fullscreen_enabled){
+	if (fullscreen_enabled) {
 		gtk_window_fullscreen(GTK_WINDOW(window));
-	}
-	else{
+	} else {
 		gtk_window_unfullscreen(GTK_WINDOW(window));
 	}
 }
 
-static void play_active_video(){
+static void play_active_video() {
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
-	WebKitDOMElement* sourceElem = webkit_dom_document_query_selector(domDocument, ".active video source", NULL);
-	if(sourceElem != NULL){
+	WebKitDOMElement* sourceElem = webkit_dom_document_query_selector(
+			domDocument, ".active video source", NULL);
+	if (sourceElem != NULL) {
 		gchar* srcAttr = webkit_dom_element_get_attribute(sourceElem, "src");
 		char videoUri[512];
 		strcpy(videoUri, base_path);
@@ -96,41 +94,43 @@ static void play_active_video(){
 		strcat(videoUri, srcAttr);
 		printf("videoPath: %s\n", videoUri);
 
-
 		//-fullscreen -maximized
 		//
 
+		/*gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
+		 popen(invocation, "r");*/
 
-
-
-
-		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
-		popen(invocation, "r");
-		
 //		gchar* dbusInvocation = "./dbuscontrolm.sh org.mpris.MediaPlayer2.omxplayer status";
-		gchar* dbusInvocation = "ls -la";
+		gchar* dbusInvocation = "ls -la 2>&1";
+//		int status;
+//		FILE* stream;
+//		char buffer[40];
+//
+//		if ((stream = popen("ls -la", "r")) == NULL) {
+//			perror("popen() failed on dbusInvocation");
+//			printf("no stream?");
+//		}
+//
+//		printf("dbus invoked");
 
 		int status;
-		FILE* stream;
-		char buffer[40];
+		FILE *stream;
+		char buffer[1024];
 
-		if((stream = popen(dbusInvocation, "r")) == NULL){
-			perror("popen() failed on dbusInvocation");
+		if ((stream = popen(dbusInvocation, "r")) == NULL) {
+			perror("popen: popen() failed");
 		}
 
-		printf("dbus invoked");
+		while (fgets(buffer, 1024, stream) != NULL){
 
-		while(fgets(buffer, 40, stream) != NULL){
-			if(buffer[strlen(buffer)] - 2 == '/'){
-				printf("%s", buffer);
-			}
+			printf("%s", buffer);
+
 		}
 
-		printf("stream read");
 
 		status = pclose(stream);
+		printf("(ls returned %d.)\n", status);
 
-		
 		//execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 
 		//omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4
@@ -140,35 +140,31 @@ static void play_active_video(){
 //		char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "-fullscreen", "black", "-e", "omxplayer", videoUri, NULL};
 //		xterm_pid = popen2(command, NULL, NULL);
 
-			//"-fullscreen", "-maximized",
+		//"-fullscreen", "-maximized",
 
 		//	execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 	}
 }
 
-static void stop_active_video(){
+static void stop_active_video() {
 //	if(xterm_pid > 0){
-		//execl("./dbuscontrolm.sh", "dbuscontrolm.sh", "org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
+	//execl("./dbuscontrolm.sh", "dbuscontrolm.sh", "org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
 //		kill(xterm_pid, SIGTERM);
-		popen("pkill xterm", "r");
-		xterm_pid = 0;
+	popen("pkill xterm", "r");
+	xterm_pid = 0;
 //	}
 }
 
-
-JSValueRef on_button_clicked (JSContextRef ctx, JSObjectRef function,
-                              JSObjectRef thisObject, size_t argumentCount,
-                              const JSValueRef arguments[],
-                              JSValueRef *exception){
-  g_print ("C-Funktion wurde aufgerufen\n");
-  return NULL;
+JSValueRef on_button_clicked(JSContextRef ctx, JSObjectRef function,
+		JSObjectRef thisObject, size_t argumentCount,
+		const JSValueRef arguments[], JSValueRef *exception) {
+	g_print("C-Funktion wurde aufgerufen\n");
+	return NULL;
 }
 
-
 JSValueRef on_before_next_slide(JSContextRef ctx, JSObjectRef function,
-        JSObjectRef thisObject, size_t argumentCount,
-        const JSValueRef arguments[],
-        JSValueRef *exception){
+		JSObjectRef thisObject, size_t argumentCount,
+		const JSValueRef arguments[], JSValueRef *exception) {
 
 	g_print("on_before_next_slide\n");
 
@@ -178,9 +174,8 @@ JSValueRef on_before_next_slide(JSContextRef ctx, JSObjectRef function,
 }
 
 JSValueRef on_after_next_slide(JSContextRef ctx, JSObjectRef function,
-        JSObjectRef thisObject, size_t argumentCount,
-        const JSValueRef arguments[],
-        JSValueRef *exception){
+		JSObjectRef thisObject, size_t argumentCount,
+		const JSValueRef arguments[], JSValueRef *exception) {
 
 	g_print("on_after_next_slide\n");
 
@@ -189,19 +184,17 @@ JSValueRef on_after_next_slide(JSContextRef ctx, JSObjectRef function,
 	return NULL;
 }
 
-
-void register_javascript_function (const char *name, JSObjectCallAsFunctionCallback callback){
-  WebKitWebFrame *frame = webkit_web_view_get_main_frame (WEBKIT_WEB_VIEW (web_view));
-  JSContextRef ctx = webkit_web_frame_get_global_context (frame);
-  JSObjectRef global = JSContextGetGlobalObject (ctx);
-  JSObjectRef func = JSObjectMakeFunctionWithCallback (ctx, NULL, callback);
-  JSStringRef jsname = JSStringCreateWithUTF8CString (
-		  name);
-  JSObjectSetProperty (ctx, global, jsname, func, 0, NULL);
-  JSStringRelease (jsname);
+void register_javascript_function(const char *name,
+		JSObjectCallAsFunctionCallback callback) {
+	WebKitWebFrame *frame = webkit_web_view_get_main_frame(
+			WEBKIT_WEB_VIEW(web_view));
+	JSContextRef ctx = webkit_web_frame_get_global_context(frame);
+	JSObjectRef global = JSContextGetGlobalObject(ctx);
+	JSObjectRef func = JSObjectMakeFunctionWithCallback(ctx, NULL, callback);
+	JSStringRef jsname = JSStringCreateWithUTF8CString(name);
+	JSObjectSetProperty(ctx, global, jsname, func, 0, NULL);
+	JSStringRelease(jsname);
 }
-
-
 
 static void on_document_loaded(WebKitWebView* web_view) {
 	g_print("on_document_loaded\n");
@@ -224,8 +217,8 @@ static void on_document_loaded(WebKitWebView* web_view) {
 static gboolean web_key_pressed(GtkWidget* window, GdkEventKey* event,
 		WebKitWebView* webView) {
 
-	if(event->state & GDK_CONTROL_MASK){
-		switch(event->keyval){
+	if (event->state & GDK_CONTROL_MASK) {
+		switch (event->keyval) {
 		case 'q':
 			gtk_widget_destroy(window);
 			break;
@@ -239,8 +232,6 @@ static gboolean web_key_pressed(GtkWidget* window, GdkEventKey* event,
 	return FALSE;
 }
 
-
-
 static WebKitWebView* createWebView(gchar* url) {
 	gboolean js = javascript;
 	gboolean fz = full_zoom;
@@ -252,7 +243,6 @@ static WebKitWebView* createWebView(gchar* url) {
 	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
 
 	gtk_window_set_default_size(GTK_WINDOW(window), 1920, 1080);
-
 
 	web_view = WEBKIT_WEB_VIEW(webkit_web_view_new());
 
@@ -287,9 +277,9 @@ static WebKitWebView* createWebView(gchar* url) {
 	g_signal_connect(web_view, "document-load-finished",
 			G_CALLBACK(on_document_loaded), web_view);
 
-/*	g_object_set_data(G_OBJECT(window), "fullscreen",
-			g_strjoin(NULL, "f", NULL));
-	gtk_window_fullscreen(GTK_WINDOW(window));*/
+	/*	g_object_set_data(G_OBJECT(window), "fullscreen",
+	 g_strjoin(NULL, "f", NULL));
+	 gtk_window_fullscreen(GTK_WINDOW(window));*/
 
 	gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(web_view));
 
@@ -301,11 +291,11 @@ static WebKitWebView* createWebView(gchar* url) {
 	gtk_widget_grab_focus(GTK_WIDGET(web_view));
 	gtk_widget_show_all(window);
 
-
 	gtk_widget_add_events(window, GDK_KEY_PRESS_MASK);
-	g_signal_connect(window, "key-press-event", G_CALLBACK(web_key_pressed), web_view);
+	g_signal_connect(window, "key-press-event", G_CALLBACK(web_key_pressed),
+			web_view);
 
-	if(fullscreen_enabled){
+	if (fullscreen_enabled) {
 		gtk_window_fullscreen(GTK_WINDOW(window));
 	}
 
@@ -313,21 +303,17 @@ static WebKitWebView* createWebView(gchar* url) {
 	return web_view;
 }
 
-
-
-
 void signal_catcher(int signal) {
 	int status;
 	int chpid = waitpid(-1, &status, WNOHANG);
 }
 
-
-void determine_base_uri(char* url){
+void determine_base_uri(char* url) {
 	int urlLength = strlen(url);
 
 	int lastSlashIdx = urlLength;
-	for(; lastSlashIdx > 0; lastSlashIdx--){
-		if(url[lastSlashIdx] == '/'){
+	for (; lastSlashIdx > 0; lastSlashIdx--) {
+		if (url[lastSlashIdx] == '/') {
 			break;
 		}
 	}
