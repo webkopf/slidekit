@@ -46,9 +46,7 @@ static pid_t xterm_pid;
 
 static void destroy(GtkWidget* widget, gpointer* data) {
 
-	execl("./dbuscontrolm.sh", "dbuscontrolm.sh",
-			"org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
-
+	//stop_active_video();
 	gtk_main_quit();
 }
 
@@ -93,36 +91,40 @@ static void play_active_video(){
 	if(sourceElem != NULL){
 		gchar* srcAttr = webkit_dom_element_get_attribute(sourceElem, "src");
 		char videoUri[512];
-		strcpy(videoUri, base_uri);
+		strcpy(videoUri, base_path);
+		strcat(videoUri, "/");
 		strcat(videoUri, srcAttr);
-		printf(videoUri, "%s");
+		printf("videoPath: %s\n", videoUri);
 
 
 		//-fullscreen -maximized
-		//gchar* invocation = "xterm -fn fixed  -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
+		//
+		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
+		popen(invocation, "r");
+		
+		
+		//execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 
 		//omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4
 
 		//char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "black", "-e", "gnome-calculator", NULL};
 
-		char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "black", "-e", "omxplayer", videoUri, NULL};
-
-
-		xterm_pid = popen2(command, NULL, NULL);
+//		char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "-fullscreen", "black", "-e", "omxplayer", videoUri, NULL};
+//		xterm_pid = popen2(command, NULL, NULL);
 
 			//"-fullscreen", "-maximized",
 
 		//	execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
-		//popen(invocation, "r");
 	}
 }
 
 static void stop_active_video(){
-	if(xterm_pid > 0){
-		execl("./dbuscontrolm.sh", "dbuscontrolm.sh", "org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
-		kill(xterm_pid, SIGTERM);
+//	if(xterm_pid > 0){
+		//execl("./dbuscontrolm.sh", "dbuscontrolm.sh", "org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
+//		kill(xterm_pid, SIGTERM);
+		popen("pkill xterm", "r");
 		xterm_pid = 0;
-	}
+//	}
 }
 
 
@@ -349,7 +351,7 @@ int main(int argc, char* argv[]) {
 	signal(SIGCHLD, signal_catcher);
 	gtk_main();
 
-	printf("normal exit");
+	printf("normal exit\n");
 	return 0;
 
 }
