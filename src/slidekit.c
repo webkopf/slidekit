@@ -122,19 +122,22 @@ static void play_active_video() {
 
 		int ret;
 		FILE *stream;
+		char buf[128];
 		char omx_status[1024];
 
 		if ((stream = popen(dbusInvocation, "r")) == NULL) {
 			perror("popen: popen() failed");
 		}
 
-		while(fgets(omx_status, 1024, stream)){
-
+		while(fgets(buf, 128, stream) != NULL){
+			strcat(omx_status, buf);
 		}
 
 
 		ret = pclose(stream);
 		printf("(ls returned %d.)\n", ret);
+
+		printf("omx_status: %s\n", omx_status);
 
 //		char status[] = "Duration: 2585040000\nPosition: 1271832\nPaused: false";
 
