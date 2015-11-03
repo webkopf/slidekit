@@ -100,7 +100,7 @@ static void play_active_video() {
 		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
 		popen(invocation, "r");
 
-		sleep(1);
+		sleep(2);
 
 		gchar* dbusInvocation = "./dbuscontrolm.sh org.mpris.MediaPlayer2.omxplayer status";
 //		gchar* dbusInvocation = "ls -la 2>&1";
