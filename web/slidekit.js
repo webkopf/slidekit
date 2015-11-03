@@ -5,7 +5,7 @@ var curSlideIdx;
 var hash = location.hash.substr(1);
 if(hash == "autoplay"){
 	curSlideIdx = 0;	
-	setInterval(nextSlideStep, 4000);
+	setInterval(nextSlideStep, 2000);
 }
 else{
 	curSlideIdx = parseInt(location.hash.substr(1)) | 0;	
@@ -35,7 +35,7 @@ function nextSlideStep(){
 		
 		slidesElem.style.webkitAnimation = "slideForward" + " 0.5s forwards";
 		
-		if(on_before_next_slide){
+		if(window.on_before_next_slide){
 			on_before_next_slide();
 		}
 		
@@ -53,7 +53,7 @@ function nextSlideStep(){
 			rootSlides[previousSlideIdx].classList.remove("active");
 			slidesElem.style.webkitAnimation = "";
 			
-			if(on_after_next_slide){
+			if(window.on_after_next_slide){
 				on_after_next_slide();
 			}
 			

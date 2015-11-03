@@ -26,6 +26,8 @@
 #include <unistd.h>
 #include <JavaScriptCore/JavaScript.h>
 
+#include "utils.h"
+
 static gboolean javascript = false;
 static gboolean private_browsing = true;
 static gboolean experimental = false;
@@ -93,14 +95,20 @@ static void play_active_video(){
 		strcat(videoUri, srcAttr);
 		printf(videoUri, "%s");
 
-		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
 
-		pid_t pid = 0;
+		//-fullscreen -maximized
+		//gchar* invocation = "xterm -fn fixed  -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
 
-		xterm_pid = fork();
-		if(xterm_pid != -1){
-			execl("/usr/bin/xterm", "xterm", "-fn", "fixed", "-fullscreen", "-maximized", "-bg", "black", "-e", "omxplayer", videoUri, NULL);
-		}
+		//omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4
+
+		//char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "black", "-e", "gnome-calculator", NULL};
+
+		char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "black", "-e", "omxplayer", videoUri, NULL};
+
+
+		xterm_pid = popen2(command, NULL, NULL);
+
+			//"-fullscreen", "-maximized",
 
 		//	execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 		//popen(invocation, "r");
@@ -314,7 +322,7 @@ int main(int argc, char* argv[]) {
 		char buf2[512];
 		strcpy(buf2, "file://");
 		strcat(buf2, cwd);
-		strcat(buf2, "/web/slidekit.html");
+		strcat(buf2, "/web/slidekit.html#autoplay");
 
 		url = buf2;
 	}
@@ -329,6 +337,8 @@ int main(int argc, char* argv[]) {
 
 	signal(SIGCHLD, signal_catcher);
 	gtk_main();
+
+	printf("normal exit");
 	return 0;
 
 }
