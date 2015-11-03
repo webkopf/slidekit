@@ -1,0 +1,180 @@
+
+*{
+	box-sizing: border-box;
+	margin: 0;
+}
+
+table{
+	border-spacing: 0;	
+}
+
+td, th{
+	padding: 0;
+	margin: 0;
+}
+
+html{
+	height: 100%;
+}
+
+body{	
+	padding: 0;
+	height: 100%;
+	font-weight: 600;
+	font-size: 57px;
+	overflow: hidden;
+}
+
+
+#slides{
+	
+	width: 100%;
+	height: 100%;
+/* 	overflow: hidden; */
+	
+/* 	-webkit-transform: translateX(-50%); */
+}
+
+#slides > section{	
+	width: 100%;
+	height: 100%;
+	position: absolute; 	
+	overflow: hidden;
+	
+	
+	text-align: center;
+	padding-left: 100px;
+	padding-right: 100px;
+	
+	display: none;
+	
+	
+  	-webkit-flex-direction: column;
+  	flex-direction: column;
+	text-align: center;
+	
+	-webkit-align-items: center;
+	align-items: center;
+	
+	-webkit-justify-content: center;
+	justify-content: center;
+	
+	-webkit-align-content: center;
+	align-content: center;
+	
+	/* -webkit-transform: translateY(-50%); */
+	/* top: 50%; */
+	
+/* 	vertical-align: middle; */
+	
+}
+
+
+@-webkit-keyframes slideForward{
+    0% {-webkit-transform: translateX(0)}   
+    100% {-webkit-transform: translateX(-100%)}
+}
+
+
+#slides > section.active{
+/* 	display: box; */
+	display: -webkit-flex;
+	display: flex;
+	
+/* 	display: table-cell; */
+}
+
+#slides > section.active + section{
+/* 	display: table-cell; */
+/* 	display: box; */
+	display: -webkit-flex;
+	display: flex;
+	left: 100%;
+}
+
+
+
+#slides > section > div > div, #slides > section > div > p{
+	/* padding-left: 150px; */
+	/* padding-right: 150px; */
+}
+
+#slides > section > div{
+	text-align: left;
+	/* margin: auto; */
+	display: inline-block;
+}
+
+#slides > section > div > *:last-child{
+	padding-bottom: 20px;
+}
+
+*[data-fragment]{
+	transition: opacity 0.5s;
+}
+
+.center{
+	text-align: center !important;
+	display: block;
+}
+
+ul{
+	text-align: left;
+	display: inline-block;
+}
+
+li{
+	margin-bottom: 60px;
+	line-height: 1.2;
+}
+
+
+h1,h2,h3,h4{
+	margin-top: 0;
+}
+
+h1{
+	font-size: 102px;
+	margin-bottom: 21px;
+}
+
+h2{
+	font-size: 82px;
+}
+
+.neighbors{
+/* 	width: 100vw; */
+	
+}
+
+.neighbors > *{
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 50px;
+	
+}
+
+.neighbors > *:last-child{
+	margin-right: 0;
+}
+
+p{
+	margin-top: 30px;
+}
+
+section > p{
+	padding-left: 150px;
+	padding-right: 150px;
+	text-align: center;
+}
+
+.fullWidth{
+	padding: 0;
+}
+
+
+
+.marginBottom{
+	margin-bottom: 50px;
+}
+/************** MVZ-spezifisch ***************/
