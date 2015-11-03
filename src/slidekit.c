@@ -107,10 +107,11 @@ static void play_active_video() {
 		gchar* srcAttr = webkit_dom_element_get_attribute(sourceElem, "src");
 
 		char invocation[512];
-		strcpy(invocation, "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer ");
-		strcat(invocation, base_path);
-		strcat(invocation, "/");
-		strcat(invocation, srcAttr);
+		sprintf(invocation, "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer %s/%s",
+				base_path, srcAttr);
+
+
+		printf("omx-invoke: %s\n", invocation);
 
 //		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
 		popen(invocation, "r");
