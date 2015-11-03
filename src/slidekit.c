@@ -97,11 +97,13 @@ static void play_active_video() {
 		//-fullscreen -maximized
 		//
 
-		/*gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
-		 popen(invocation, "r");*/
+		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
+		popen(invocation, "r");
 
-//		gchar* dbusInvocation = "./dbuscontrolm.sh org.mpris.MediaPlayer2.omxplayer status";
-		gchar* dbusInvocation = "ls -la 2>&1";
+		sleep(1);
+
+		gchar* dbusInvocation = "./dbuscontrolm.sh org.mpris.MediaPlayer2.omxplayer status";
+//		gchar* dbusInvocation = "ls -la 2>&1";
 //		int status;
 //		FILE* stream;
 //		char buffer[40];
