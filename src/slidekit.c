@@ -81,6 +81,23 @@ static void toggle_fullscreen(GtkWidget* window, WebKitWebView* webView) {
 	}
 }
 
+
+long determineRemainingMilliSecs(char* omx_status_string){
+
+	char* ptr = strtok(omx_status_string, " ");
+	char* durationMicroSecsStr = strtok(NULL, "\n");
+	printf("%s\n", durationMicroSecsStr);
+	strtok(NULL, " ");
+	char* positionMicroSecsStr = strtok(NULL, "\n");
+
+	long durationMicroSecs = strtol(durationMicroSecsStr, NULL, 10);
+	long positionMicroSecs = strtol(positionMicroSecsStr, NULL, 10);
+
+	long remainingMilliSecs = (durationMicroSecs - positionMicroSecs) / 1000;
+
+	return remainingMilliSecs;
+}
+
 static void play_active_video() {
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
@@ -88,50 +105,50 @@ static void play_active_video() {
 			domDocument, ".active video source", NULL);
 	if (sourceElem != NULL) {
 		gchar* srcAttr = webkit_dom_element_get_attribute(sourceElem, "src");
-		char videoUri[512];
-		strcpy(videoUri, base_path);
-		strcat(videoUri, "/");
-		strcat(videoUri, srcAttr);
-		printf("videoPath: %s\n", videoUri);
 
-		//-fullscreen -maximized
-		//
+		char invocation[512];
+		strcpy(invocation, "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer ");
+		strcat(invocation, base_path);
+		strcat(invocation, "/");
+		strcat(invocation, srcAttr);
 
-		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
+//		gchar* invocation = "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4";
 		popen(invocation, "r");
 
 		sleep(2);
 
 		gchar* dbusInvocation = "./dbuscontrolm.sh org.mpris.MediaPlayer2.omxplayer status";
-//		gchar* dbusInvocation = "ls -la 2>&1";
-//		int status;
-//		FILE* stream;
-//		char buffer[40];
-//
-//		if ((stream = popen("ls -la", "r")) == NULL) {
-//			perror("popen() failed on dbusInvocation");
-//			printf("no stream?");
-//		}
-//
-//		printf("dbus invoked");
 
-		int status;
+		int ret;
 		FILE *stream;
-		char buffer[1024];
+		char omx_status[1024];
 
 		if ((stream = popen(dbusInvocation, "r")) == NULL) {
 			perror("popen: popen() failed");
 		}
 
-		while (fgets(buffer, 1024, stream) != NULL){
+		char* res = fgets(omx_status, 1024, stream);
 
-			printf("%s", buffer);
+		ret = pclose(stream);
+		printf("(ls returned %d.)\n", ret);
 
-		}
+//		char status[] = "Duration: 2585040000\nPosition: 1271832\nPaused: false";
+
+		long remainingMilliSecs = determineRemainingMilliSecs(omx_status);
+
+		WebKitWebFrame* frame = webkit_web_view_get_main_frame(web_view);
+		JSGlobalContextRef ctx = webkit_web_frame_get_global_context(frame);
+
+		JSObjectRef global = JSContextGetGlobalObject(ctx);
+
+		char scriptStr[64];
+		sprintf(scriptStr,
+			"setTimeout(function(){nextSlideStep()}, %ld);", remainingMilliSecs);
 
 
-		status = pclose(stream);
-		printf("(ls returned %d.)\n", status);
+		JSStringRef script = JSStringCreateWithUTF8CString(scriptStr);
+
+		JSEvaluateScript(ctx, script, NULL, NULL, 0, NULL);
 
 		//execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 
@@ -201,9 +218,7 @@ void register_javascript_function(const char *name,
 static void on_document_loaded(WebKitWebView* web_view) {
 	g_print("on_document_loaded\n");
 
-	WebKitWebFrame* frame = webkit_web_view_get_main_frame(web_view);
 
-	JSGlobalContextRef ctx = webkit_web_frame_get_global_context(frame);
 
 	register_javascript_function("on_before_next_slide", on_before_next_slide);
 	register_javascript_function("on_after_next_slide", on_after_next_slide);
@@ -326,6 +341,9 @@ void determine_base_uri(char* url) {
 
 }
 
+
+
+
 int main(int argc, char* argv[]) {
 
 	char *url = argv[1];
@@ -346,7 +364,7 @@ int main(int argc, char* argv[]) {
 		char buf2[512];
 		strcpy(buf2, "file://");
 		strcat(buf2, base_path);
-		strcat(buf2, "/slidekit.html#autoplay");
+		strcat(buf2, "/slidekit.html");
 
 		url = buf2;
 
