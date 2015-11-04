@@ -1,10 +1,9 @@
 var defaultStepDuration = 5;
-
 var rootSlides = document.querySelectorAll("#slides > section");
-
 var curSlideIdx;
-
 var autoplay = false;
+var nextSlideStepTimeout;
+
 
 var hash = location.hash.substr(1);
 if(hash == "autoplay"){
@@ -12,7 +11,7 @@ if(hash == "autoplay"){
 	autoplay = true;
 	var durationAttr = rootSlides[curSlideIdx].getAttribute("data-duration")
 	var duration = parseInt(durationAttr) | defaultStepDuration;	
-	setTimeout(nextSlideStep, duration * 1000);
+	nextSlideStepTimeout = setTimeout(nextSlideStep, duration * 1000);
 	
 }
 else{
@@ -27,6 +26,7 @@ var curDataFragmentIdx;
 
 
 function nextSlideStep(){
+	clearTimeout(nextSlideStepTimeout);
 	
 	var stepDuration;
 		
@@ -84,7 +84,7 @@ function nextSlideStep(){
 		if(stepDuration == null){
 			stepDuration = defaultStepDuration;
 		}
-		setTimeout(nextSlideStep, stepDuration * 1000);
+		nextSlideStepTimeout = setTimeout(nextSlideStep, stepDuration * 1000);
 	}
 	
 	
@@ -103,6 +103,8 @@ function initDataFragments(){
 initDataFragments();
 
 function previousSlideStep(){
+	clearTimeout(nextSlideStepTimeout);
+	
 	rootSlides[curSlideIdx].classList.remove("active");
 	curSlideIdx--;
 	
