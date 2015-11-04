@@ -1,11 +1,19 @@
+var defaultStepDuration = 5;
+
 var rootSlides = document.querySelectorAll("#slides > section");
 
 var curSlideIdx;
 
+var autoplay = false;
+
 var hash = location.hash.substr(1);
 if(hash == "autoplay"){
-	curSlideIdx = 0;	
-	setInterval(nextSlideStep, 5000);
+	curSlideIdx = 0;
+	autoplay = true;
+	var durationAttr = rootSlides[curSlideIdx].getAttribute("data-duration")
+	var duration = parseInt(durationAttr) | defaultStepDuration;	
+	setTimeout(nextSlideStep, duration * 1000);
+	
 }
 else{
 	curSlideIdx = parseInt(location.hash.substr(1)) | 0;	
@@ -19,27 +27,37 @@ var curDataFragmentIdx;
 
 
 function nextSlideStep(){
+	
+	var stepDuration;
 		
 	if(curDataFragmentIdx < curDataFragments.length){
+		var fragment = curDataFragments[curDataFragmentIdx];
+		fragment.style.opacity = "1";
+		fragment.style.visibility = "visible";
 		
-		curDataFragments[curDataFragmentIdx].style.opacity = "1";
-		curDataFragments[curDataFragmentIdx].style.visibility = "visible";
+		stepDuration = fragment.getAttribute("data-duration");
+		
 		curDataFragmentIdx++;
+		
+		
 	}
 	else{
 //		rootSlides[curSlideIdx].style.display = "none";
 		curSlideIdx = (curSlideIdx + 1) % rootSlides.length;		
 		initDataFragments();
 		location.hash = curSlideIdx;
+		stepDuration = rootSlides[curSlideIdx].getAttribute("data-duration");
 		
-		var slidesElem = document.getElementById("slides");
-		
+		var slidesElem = document.getElementById("slides");				
 		slidesElem.style.webkitAnimation = "slideForward" + " 0.5s forwards";
 		
+		//notify slidekit-binary, if it has injected according method
 		if(window.on_before_next_slide){
 			on_before_next_slide();
 		}
 		
+		// refreshes the "active"-state after the animation, so the next slide becomes
+		// rendered for the "slide-in-animation"
 		setTimeout(function(){
 			rootSlides[curSlideIdx].classList.add("active");
 			
@@ -54,12 +72,22 @@ function nextSlideStep(){
 			rootSlides[previousSlideIdx].classList.remove("active");
 			slidesElem.style.webkitAnimation = "";
 			
+			//notify slidekit-binary, if it has injected according method
 			if(window.on_after_next_slide){
 				on_after_next_slide();
 			}
 			
 		}, 600);
 	}
+	
+	if(autoplay){
+		if(stepDuration == null){
+			stepDuration = defaultStepDuration;
+		}
+		setTimeout(nextSlideStep, stepDuration * 1000);
+	}
+	
+	
 }
 
 function initDataFragments(){
@@ -75,11 +103,13 @@ function initDataFragments(){
 initDataFragments();
 
 function previousSlideStep(){
+	rootSlides[curSlideIdx].classList.remove("active");
 	curSlideIdx--;
 	
 	if(curSlideIdx < 0){
 		curSlideIdx = rootSlides.length - 1;
 	}
+	rootSlides[curSlideIdx].classList.add("active");
 	location.hash = curSlideIdx;
 	var term = "s" + curSlideIdx;
 	document.body.className = term;

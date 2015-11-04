@@ -1,4 +1,4 @@
-/*                Minimal Kiosk Browser
+/*
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ static void play_active_video() {
 
 		char scriptStr[64];
 		sprintf(scriptStr,
-			"setTimeout(function(){nextSlideStep()}, %ld);", remainingMilliSecs);
+			"setTimeout(nextSlideStep, %ld);", remainingMilliSecs);
 
 
 		JSStringRef script = JSStringCreateWithUTF8CString(scriptStr);
@@ -216,17 +216,14 @@ void register_javascript_function(const char *name,
 static void on_document_loaded(WebKitWebView* web_view) {
 	g_print("on_document_loaded\n");
 
-
-
 	register_javascript_function("on_before_next_slide", on_before_next_slide);
 	register_javascript_function("on_after_next_slide", on_after_next_slide);
 
-//	WebKitDOMHTMLElement* body = webkit_dom_document_get_body(domDocument);
-
-//	webkit_dom_element_set_attribute(body, "style", "background: pink", NULL);
+	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
+	WebKitDOMElement* body = (WebKitDOMElement*) webkit_dom_document_get_body(domDocument);
+	webkit_dom_element_set_attribute(body, "class", "raspberryMode", NULL);
 
 	play_active_video();
-
 }
 
 static gboolean web_key_pressed(GtkWidget* window, GdkEventKey* event,
