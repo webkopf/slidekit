@@ -100,8 +100,7 @@ long determineRemainingMilliSecs(char* omx_status_string){
 
 static void play_active_video() {
 
-#define OMX_DISABLED 1
-
+//#define OMX_DISABLED
 #ifndef OMX_DISABLED
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
@@ -112,7 +111,7 @@ static void play_active_video() {
 
 		char invocation[512];
 		sprintf(invocation, "xterm -fn fixed -fullscreen -maximized -bg black -fg black -e omxplayer %s/%s",
-				base_path, srcAttr);
+				basePath, srcAttr);
 
 
 		printf("omx-invoke: %s\n", invocation);
