@@ -37,8 +37,8 @@ static gboolean no_autoplay = false;
 static gboolean smooth_scrolling = false;
 static gboolean fullscreen_enabled = false;
 
-char base_path[512];
-char* base_uri;
+char htmlFilePath[4096];
+char* basePath;
 
 static WebKitWebView* web_view;
 
@@ -99,6 +99,10 @@ long determineRemainingMilliSecs(char* omx_status_string){
 }
 
 static void play_active_video() {
+
+#define OMX_DISABLED 1
+
+#ifndef OMX_DISABLED
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
 	WebKitDOMElement* sourceElem = webkit_dom_document_query_selector(
@@ -154,22 +158,10 @@ static void play_active_video() {
 
 
 		JSStringRef script = JSStringCreateWithUTF8CString(scriptStr);
-
 		JSEvaluateScript(ctx, script, NULL, NULL, 0, NULL);
-
-		//execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
-
-		//omxplayer /home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4
-
-		//char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "black", "-e", "gnome-calculator", NULL};
-
-//		char *command[] ={"xterm", "-fn", "fixed", "-bg", "black", "-fg", "-fullscreen", "black", "-e", "omxplayer", videoUri, NULL};
-//		xterm_pid = popen2(command, NULL, NULL);
-
-		//"-fullscreen", "-maximized",
-
-		//	execl("/bin/sh", "sh", "-c", "omxplayer", "-win", "50,50,300,300", "/home/pi/mvz/tvp-affenwelten-e01-br-1080p.mp4", NULL);
 	}
+
+#endif
 }
 
 static void stop_active_video() {
@@ -256,9 +248,11 @@ static gboolean web_key_pressed(GtkWidget* window, GdkEventKey* event,
 	return FALSE;
 }
 
-static WebKitWebView* createWebView(gchar* url) {
-	gboolean js = javascript;
-	gboolean fz = full_zoom;
+static WebKitWebView* createWebView() {
+
+	char url[4096];
+	strcpy(url, "file://");
+	strcat(url, htmlFilePath);
 
 	WebKitWebSettings* settings;
 
@@ -296,7 +290,6 @@ static WebKitWebView* createWebView(gchar* url) {
 			no_autoplay, NULL);
 
 	g_object_set(G_OBJECT(settings), "enable-scripts", TRUE, NULL);
-	webkit_web_view_set_full_content_zoom(web_view, fz);
 
 	g_signal_connect(web_view, "document-load-finished",
 			G_CALLBACK(on_document_loaded), web_view);
@@ -332,30 +325,26 @@ void signal_catcher(int signal) {
 	int chpid = waitpid(-1, &status, WNOHANG);
 }
 
-void determine_base_uri(char* url) {
-	int urlLength = strlen(url);
+void determineBasePath(char* htmlFilePath) {
+	int urlLength = strlen(htmlFilePath);
 
 	int lastSlashIdx = urlLength;
 	for (; lastSlashIdx > 0; lastSlashIdx--) {
-		if (url[lastSlashIdx] == '/') {
+		if (htmlFilePath[lastSlashIdx] == '/') {
 			break;
 		}
 	}
 
-	base_uri = (char *) malloc((lastSlashIdx + 1) * sizeof(char));
-	memcpy(base_uri, url, lastSlashIdx);
-	base_uri[lastSlashIdx + 1] = '\0';
-
+	basePath = (char *) malloc((lastSlashIdx + 1) * sizeof(char));
+	memcpy(basePath, htmlFilePath, lastSlashIdx);
+	basePath[lastSlashIdx] = '\0';
 }
-
-
 
 
 int main(int argc, char* argv[]) {
 
-	char *url = argv[1];
-	if (url == NULL) {
-		//=> no arg provided, show slidekit.html
+	if (argv[1] == NULL) {
+		//=> no arg provided, show slidekit.html from the web-folder
 		long size;
 		char *buf;
 		char *cwd;
@@ -365,33 +354,28 @@ int main(int argc, char* argv[]) {
 			cwd = getcwd(buf, (size_t) size);
 		}
 
-		strcpy(base_path, cwd);
-		strcat(base_path, "/web");
-
-		char buf2[512];
-		strcpy(buf2, "file://");
-		strcat(buf2, base_path);
-		strcat(buf2, "/slidekit.html");
-
-		url = buf2;
-
-		printf("url: %s\n", url);
+		htmlFilePath[4096];
+		strcpy(htmlFilePath, cwd);
+		strcat(htmlFilePath, "/web/slidekit.html");
+	}
+	else{
+		strcpy(htmlFilePath, argv[1]);
 	}
 
-	determine_base_uri(url);
+	determineBasePath(htmlFilePath);
 
-	printf("base_path: %s\n", base_path);
-	printf("base_url: %s\n", base_uri);
+	printf("htmlFilePath: %s\n", htmlFilePath);
+	printf("basePath: %s\n", basePath);
 
 	gtk_init(&argc, &argv);
 
 	webkit_set_cache_model(WEBKIT_CACHE_MODEL_DOCUMENT_VIEWER);
 
-	createWebView(url);
+	createWebView();
 
 	signal(SIGCHLD, signal_catcher);
 	gtk_main();
-
+//
 	printf("normal exit\n");
 	return 0;
 

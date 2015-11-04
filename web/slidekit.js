@@ -10,6 +10,7 @@ if(hash == "autoplay"){
 else{
 	curSlideIdx = parseInt(location.hash.substr(1)) | 0;	
 }
+rootSlides[curSlideIdx].classList.add("active");
 
 var curDataFragments = null;
 var curDataFragmentIdx;
