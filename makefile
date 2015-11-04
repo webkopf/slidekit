@@ -10,5 +10,6 @@ install: all
 	cp bin/slidekit /usr/bin
 	mkdir -p /usr/local/share/slidekit
 	cp web/slidekit.* /usr/local/share/slidekit
+	cp omx-dbus-control.sh /usr/local/share/slidekit
 	
 	
