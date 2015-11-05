@@ -11,15 +11,14 @@
 
 #include "utils.h"
 
-static gboolean javascript = false;
-static gboolean private_browsing = true;
 static gboolean experimental = false;
-static gboolean full_zoom = false;
 static gboolean page_cache = false;
 static gboolean no_autoplay = false;
 static gboolean smooth_scrolling = false;
 static gboolean fullscreen_enabled = false;
 
+
+gboolean videoPlaying = false;
 char htmlFilePath[4096];
 char* basePath;
 
@@ -141,18 +140,18 @@ static void play_active_video() {
 
 		JSStringRef script = JSStringCreateWithUTF8CString(scriptStr);
 		JSEvaluateScript(ctx, script, NULL, NULL, 0, NULL);
+
+		videoPlaying = TRUE;
 	}
 
 #endif
 }
 
 static void stop_active_video() {
-//	if(xterm_pid > 0){
-	//execl("./dbuscontrolm.sh", "dbuscontrolm.sh", "org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
-//		kill(xterm_pid, SIGTERM);
-	popen("pkill xterm", "r");
-	xterm_pid = 0;
-//	}
+	if(videoPlaying){
+		popen("pkill xterm", "r");
+		videoPlaying = false;
+	}
 }
 
 JSValueRef on_button_clicked(JSContextRef ctx, JSObjectRef function,
@@ -166,7 +165,12 @@ JSValueRef on_before_next_slide(JSContextRef ctx, JSObjectRef function,
 		JSObjectRef thisObject, size_t argumentCount,
 		const JSValueRef arguments[], JSValueRef *exception) {
 
-	g_print("on_before_next_slide\n");
+	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
+
+	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active");
+	gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
+
+	g_print("on_before_next_slide, active className: %s\n", className);
 
 	stop_active_video();
 
@@ -177,7 +181,12 @@ JSValueRef on_after_next_slide(JSContextRef ctx, JSObjectRef function,
 		JSObjectRef thisObject, size_t argumentCount,
 		const JSValueRef arguments[], JSValueRef *exception) {
 
-	g_print("on_after_next_slide\n");
+	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
+
+	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active");
+	gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
+
+	g_print("on_after_next_slide, active className: %s\n", className);
 
 	play_active_video();
 
@@ -245,19 +254,15 @@ static WebKitWebView* createWebView() {
 
 	settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(web_view));
 
-	g_object_set(G_OBJECT(settings), "enable-private-browsing",
-			private_browsing, NULL);
-	g_object_set(G_OBJECT(settings), "enable-file-access-from-file-uris", TRUE,
-	NULL);
-	g_object_set(G_OBJECT(settings), "enable-universal-access-from-file-uris",
-	TRUE, NULL);
+	g_object_set(G_OBJECT(settings), "enable-private-browsing", TRUE, NULL);
+	g_object_set(G_OBJECT(settings), "enable-file-access-from-file-uris", TRUE, NULL);
+	g_object_set(G_OBJECT(settings), "enable-universal-access-from-file-uris", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-spatial-navigation", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "default-encoding", "utf-8", NULL);
 	g_object_set(G_OBJECT(settings), "enable-page-cache", page_cache, NULL);
 	g_object_set(G_OBJECT(settings), "enable-plugins", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-site-specific-quirks", TRUE, NULL);
-	g_object_set(G_OBJECT(settings), "enable-accelerated-compositing", TRUE,
-	NULL);
+	g_object_set(G_OBJECT(settings), "enable-accelerated-compositing", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-webgl", FALSE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-webaudio", experimental, NULL);
 	g_object_set(G_OBJECT(settings), "enable-media-stream", experimental, NULL);
