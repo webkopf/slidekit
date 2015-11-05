@@ -1,3 +1,20 @@
+/*
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version (see http://www.gnu.org/licenses/ ).
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ Copyright 2013 Ralph Glass (Minimal Web Browser base code)
+ Copyright 2013-2015 Guenter Kreidl (Minimal Kiosk Browser)
+
+ Version 1.6.9 using gtk+3 and webkitgtk-3.0
+ */
 
 #include <gtk/gtk.h>
 #include <webkit/webkit.h>
@@ -11,18 +28,21 @@
 
 #include "utils.h"
 
+static gboolean javascript = false;
+static gboolean private_browsing = true;
 static gboolean experimental = false;
+static gboolean full_zoom = false;
 static gboolean page_cache = false;
 static gboolean no_autoplay = false;
 static gboolean smooth_scrolling = false;
 static gboolean fullscreen_enabled = false;
 
-
-gboolean videoPlaying = false;
 char htmlFilePath[4096];
 char* basePath;
 
 static WebKitWebView* web_view;
+
+static pid_t xterm_pid;
 
 static void destroy(GtkWidget* widget, gpointer* data) {
 
@@ -138,18 +158,18 @@ static void play_active_video() {
 
 		JSStringRef script = JSStringCreateWithUTF8CString(scriptStr);
 		JSEvaluateScript(ctx, script, NULL, NULL, 0, NULL);
-
-		videoPlaying = TRUE;
 	}
 
 #endif
 }
 
 static void stop_active_video() {
-	if(videoPlaying){
-		popen("pkill xterm", "r");
-		videoPlaying = false;
-	}
+//	if(xterm_pid > 0){
+	//execl("./dbuscontrolm.sh", "dbuscontrolm.sh", "org.mpris.MediaPlayer2.omxplayer", "stop", NULL);
+//		kill(xterm_pid, SIGTERM);
+	popen("pkill xterm", "r");
+	xterm_pid = 0;
+//	}
 }
 
 JSValueRef on_button_clicked(JSContextRef ctx, JSObjectRef function,
@@ -165,10 +185,11 @@ JSValueRef on_before_next_slide(JSContextRef ctx, JSObjectRef function,
 
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
-	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active", NULL);
-	gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
+		WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active", NULL);
+		gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
 
-	g_print("on_before_next_slide, active className: %s\n", className);
+		g_print("on_before_next_slide, active className: %s\n", className);
+
 
 	stop_active_video();
 
@@ -181,10 +202,11 @@ JSValueRef on_after_next_slide(JSContextRef ctx, JSObjectRef function,
 
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
-	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active", NULL);
-	gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
+		WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active", NULL);
+		gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
 
-	g_print("on_after_next_slide, active className: %s\n", className);
+		g_print("on_after_next_slide, active className: %s\n", className);
+
 
 	play_active_video();
 
@@ -243,7 +265,7 @@ static WebKitWebView* createWebView() {
 	WebKitWebSettings* settings;
 
 	GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+	GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
 
 	gtk_window_set_default_size(GTK_WINDOW(window), 1920, 1080);
@@ -252,20 +274,25 @@ static WebKitWebView* createWebView() {
 
 	settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(web_view));
 
-	g_object_set(G_OBJECT(settings), "enable-private-browsing", TRUE, NULL);
-	g_object_set(G_OBJECT(settings), "enable-file-access-from-file-uris", TRUE, NULL);
-	g_object_set(G_OBJECT(settings), "enable-universal-access-from-file-uris", TRUE, NULL);
-	g_object_set(G_OBJECT(settings), "enable-spatial-navigation", false, NULL);
+	g_object_set(G_OBJECT(settings), "enable-private-browsing",
+			private_browsing, NULL);
+	g_object_set(G_OBJECT(settings), "enable-file-access-from-file-uris", TRUE,
+	NULL);
+	g_object_set(G_OBJECT(settings), "enable-universal-access-from-file-uris",
+	TRUE, NULL);
+	g_object_set(G_OBJECT(settings), "enable-spatial-navigation", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "default-encoding", "utf-8", NULL);
 	g_object_set(G_OBJECT(settings), "enable-page-cache", page_cache, NULL);
 	g_object_set(G_OBJECT(settings), "enable-plugins", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-site-specific-quirks", TRUE, NULL);
-	g_object_set(G_OBJECT(settings), "enable-accelerated-compositing", TRUE, NULL);
+	g_object_set(G_OBJECT(settings), "enable-accelerated-compositing", TRUE,
+	NULL);
 	g_object_set(G_OBJECT(settings), "enable-webgl", FALSE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-webaudio", experimental, NULL);
 	g_object_set(G_OBJECT(settings), "enable-media-stream", experimental, NULL);
 	g_object_set(G_OBJECT(settings), "enable-mediasource", experimental, NULL);
-	g_object_set(G_OBJECT(settings), "enable-smooth-scrolling",smooth_scrolling, NULL);
+	g_object_set(G_OBJECT(settings), "enable-smooth-scrolling",
+			smooth_scrolling, NULL);
 
 	g_object_set(G_OBJECT(settings), "media-playback-requires-user-gesture",
 			no_autoplay, NULL);
@@ -274,6 +301,10 @@ static WebKitWebView* createWebView() {
 
 	g_signal_connect(web_view, "document-load-finished",
 			G_CALLBACK(on_document_loaded), web_view);
+
+	/*	g_object_set_data(G_OBJECT(window), "fullscreen",
+	 g_strjoin(NULL, "f", NULL));
+	 gtk_window_fullscreen(GTK_WINDOW(window));*/
 
 	gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(web_view));
 
@@ -349,7 +380,6 @@ int main(int argc, char* argv[]) {
 	webkit_set_cache_model(WEBKIT_CACHE_MODEL_DOCUMENT_VIEWER);
 
 	createWebView();
-	printf("webview created");
 
 	signal(SIGCHLD, signal_catcher);
 	gtk_main();
