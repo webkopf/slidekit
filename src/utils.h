@@ -8,7 +8,7 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
-pid_t popen2(const char **command, int *infp, int *outfp);
+//pid_t popen2(const char **command, int *infp, int *outfp);
 
 
 

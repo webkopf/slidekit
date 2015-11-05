@@ -24,8 +24,6 @@ char* basePath;
 
 static WebKitWebView* web_view;
 
-static pid_t xterm_pid;
-
 static void destroy(GtkWidget* widget, gpointer* data) {
 
 	//stop_active_video();
@@ -267,8 +265,7 @@ static WebKitWebView* createWebView() {
 	g_object_set(G_OBJECT(settings), "enable-webaudio", experimental, NULL);
 	g_object_set(G_OBJECT(settings), "enable-media-stream", experimental, NULL);
 	g_object_set(G_OBJECT(settings), "enable-mediasource", experimental, NULL);
-	g_object_set(G_OBJECT(settings), "enable-smooth-scrolling",
-			smooth_scrolling, NULL);
+	g_object_set(G_OBJECT(settings), "enable-smooth-scrolling",smooth_scrolling, NULL);
 
 	g_object_set(G_OBJECT(settings), "media-playback-requires-user-gesture",
 			no_autoplay, NULL);
@@ -277,10 +274,6 @@ static WebKitWebView* createWebView() {
 
 	g_signal_connect(web_view, "document-load-finished",
 			G_CALLBACK(on_document_loaded), web_view);
-
-	/*	g_object_set_data(G_OBJECT(window), "fullscreen",
-	 g_strjoin(NULL, "f", NULL));
-	 gtk_window_fullscreen(GTK_WINDOW(window));*/
 
 	gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(web_view));
 
@@ -356,8 +349,9 @@ int main(int argc, char* argv[]) {
 	webkit_set_cache_model(WEBKIT_CACHE_MODEL_DOCUMENT_VIEWER);
 
 	createWebView();
+	printf("webview created");
 
-//	signal(SIGCHLD, signal_catcher);
+	signal(SIGCHLD, signal_catcher);
 	gtk_main();
 //
 	printf("normal exit\n");
