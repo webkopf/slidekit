@@ -1,7 +1,7 @@
 
 all: 
 	mkdir -p bin	
-	gcc -O0 src/slidekit.c src/utils.c -o bin/slidekit `pkg-config --cflags gtk+-3.0 --libs webkitgtk-3.0` -g
+	gcc -O0 src/slidekit.c src/utils.c -o bin/slidekit `pkg-config --cflags gtk+-2.0 --libs webkit-1.0` -g
 	
 clean:
 	rm bin/slidekit

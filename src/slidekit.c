@@ -1,20 +1,3 @@
-/*
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version (see http://www.gnu.org/licenses/ ).
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- Copyright 2013 Ralph Glass (Minimal Web Browser base code)
- Copyright 2013-2015 Guenter Kreidl (Minimal Kiosk Browser)
-
- Version 1.6.9 using gtk+3 and webkitgtk-3.0
- */
 
 #include <gtk/gtk.h>
 #include <webkit/webkit.h>
@@ -253,7 +236,7 @@ static WebKitWebView* createWebView() {
 	WebKitWebSettings* settings;
 
 	GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
 	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
 
 	gtk_window_set_default_size(GTK_WINDOW(window), 1920, 1080);
