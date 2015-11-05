@@ -29,12 +29,12 @@ body.raspberryMode video{
 	display: none;
 }
 
-
-/********** root-layout for 'forward-sliding' and centered content ********/
 #slides{
+	
 	width: 100%;
 	height: 100%;
 /* 	overflow: hidden; */
+	
 /* 	-webkit-transform: translateX(-50%); */
 }
 
@@ -44,13 +44,15 @@ body.raspberryMode video{
 	position: absolute; 	
 	overflow: hidden;
 	
+	text-align: center;
 	padding-left: 100px;
 	padding-right: 100px;
 	
-	display: none; /*only render active and following slide */ 
+	display: none;
 	
   	-webkit-flex-direction: column;
-  	flex-direction: column;	
+  	flex-direction: column;
+	text-align: center;
 	
 	-webkit-align-items: center;
 	align-items: center;
@@ -60,15 +62,32 @@ body.raspberryMode video{
 	
 	-webkit-align-content: center;
 	align-content: center;
-			
+	
+	/* -webkit-transform: translateY(-50%); */
+	/* top: 50%; */
+	
+/* 	vertical-align: middle; */
+	
 }
 
+
+@-webkit-keyframes slideForward{
+    0% {-webkit-transform: translateX(0)}   
+    100% {-webkit-transform: translateX(-100%)}
+}
+
+
 #slides > section.active{
+/* 	display: box; */
 	display: -webkit-flex;
-	display: flex;	
+	display: flex;
+	
+/* 	display: table-cell; */
 }
 
 #slides > section.active + section{
+/* 	display: table-cell; */
+/* 	display: box; */
 	display: -webkit-flex;
 	display: flex;
 	left: 100%;
@@ -76,56 +95,34 @@ body.raspberryMode video{
 
 
 
-/********** animations **********/
+#slides > section > div > div, #slides > section > div > p{
+	/* padding-left: 150px; */
+	/* padding-right: 150px; */
+}
 
-@-webkit-keyframes slideForward{
-    0% {-webkit-transform: translateX(0)}   
-    100% {-webkit-transform: translateX(-100%)}
+#slides > section > div{
+	text-align: left;
+	/* margin: auto; */
+	display: inline-block;
+}
+
+#slides > section > div > *:last-child{
+	padding-bottom: 20px;
 }
 
 *[data-fragment]{
 	transition: opacity 0.5s;
 }
 
-
-
-/********** detail-layout of single slides **********/
-
-#slides > section > div > div, #slides > section > div > p{
-	/* padding-left: 150px; */
-	/* padding-right: 150px; */
+.center{
+	text-align: center !important;
+	display: block;
 }
 
-/* center every element by default */
-#slides > section > *{
+ul{
+	text-align: left;
 	display: inline-block;
 }
-
-/* mithilfe von divs in den sections werden visuell Gruppen gebildet,
-und der Innenabstand der Kind-Elemente deaktiviert */ 
-#slides > section div{ 
-	display: inline-block;
-	margin-bottom: 30px;
-}
-
-/*per default werden alle Elemente in einem div gefloatet, damit
-dann das gesamte div horizontal zentriert wird */
-#slides > section div > *{
-	margin-top: 0;
-	margin-bottom: 0;
-	float: left;
-	clear: left;
-}
-
-#slides > section div > div{
-	margin-bottom: 30px;
-}
-
-#slides > section div:last-child{
-	margin-bottom: 0;
-}
-
-
 
 li{
 	margin-bottom: 40px;
@@ -139,37 +136,46 @@ h1,h2,h3,h4{
 
 h1{
 	font-size: 102px;
-	margin-bottom: 50px;
+	margin-bottom: 21px;
 }
 
 h2{
 	font-size: 82px;
-	margin-bottom: 40px;
+}
+
+.neighbors{
+/* 	width: 100vw; */
+	
 }
 
 .neighbors > *{
 	display: inline-block;
 	vertical-align: top;
-	margin-right: 50px;	
-	float: none !important;
-}
-
-.center{
-	text-align: center;
-	display: block;
+	margin-right: 50px;
+	
 }
 
 .neighbors > *:last-child{
 	margin-right: 0;
 }
 
+p{
+	margin-top: 30px;
+}
+
+section > p{
+	padding-left: 150px;
+	padding-right: 150px;
+	text-align: center;
+}
+
+.fullWidth{
+	padding: 0;
+}
+
 .marginBottom{
 	margin-bottom: 50px;
 }
-
-
-
-/********* misc **********/
 
 #background{
 	position: absolute;
