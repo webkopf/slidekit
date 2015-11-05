@@ -257,7 +257,7 @@ static WebKitWebView* createWebView() {
 	g_object_set(G_OBJECT(settings), "enable-private-browsing", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-file-access-from-file-uris", TRUE, NULL);
 	g_object_set(G_OBJECT(settings), "enable-universal-access-from-file-uris", TRUE, NULL);
-	g_object_set(G_OBJECT(settings), "enable-spatial-navigation", TRUE, NULL);
+	g_object_set(G_OBJECT(settings), "enable-spatial-navigation", false, NULL);
 	g_object_set(G_OBJECT(settings), "default-encoding", "utf-8", NULL);
 	g_object_set(G_OBJECT(settings), "enable-page-cache", page_cache, NULL);
 	g_object_set(G_OBJECT(settings), "enable-plugins", TRUE, NULL);
@@ -357,7 +357,7 @@ int main(int argc, char* argv[]) {
 
 	createWebView();
 
-	signal(SIGCHLD, signal_catcher);
+//	signal(SIGCHLD, signal_catcher);
 	gtk_main();
 //
 	printf("normal exit\n");
