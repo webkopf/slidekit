@@ -167,7 +167,7 @@ JSValueRef on_before_next_slide(JSContextRef ctx, JSObjectRef function,
 
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
-	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active");
+	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active", NULL);
 	gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
 
 	g_print("on_before_next_slide, active className: %s\n", className);
@@ -183,7 +183,7 @@ JSValueRef on_after_next_slide(JSContextRef ctx, JSObjectRef function,
 
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
-	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active");
+	WebKitDOMElement* activeSlideElem = webkit_dom_document_query_selector(domDocument, ".active", NULL);
 	gchar* className = webkit_dom_element_get_attribute(activeSlideElem, "class");
 
 	g_print("on_after_next_slide, active className: %s\n", className);
