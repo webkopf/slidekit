@@ -39,10 +39,8 @@ function nextSlideStep(){
 		
 		curDataFragmentIdx++;
 		
-		
 	}
 	else{
-//		rootSlides[curSlideIdx].style.display = "none";
 		curSlideIdx = (curSlideIdx + 1) % rootSlides.length;		
 		initDataFragments();
 		location.hash = curSlideIdx;
@@ -81,13 +79,22 @@ function nextSlideStep(){
 	}
 	
 	if(autoplay){
-		if(stepDuration == null){
-			stepDuration = defaultStepDuration;
+		
+		//wenn eine step-Duration eingestellt ist, auf jeden Fall weiter 
+		//nach dieser duration weitersteppen
+		if(stepDuration != null){
+			nextSlideStepTimeout = setTimeout(nextSlideStep, stepDuration * 1000);
 		}
-		nextSlideStepTimeout = setTimeout(nextSlideStep, stepDuration * 1000);
+		else{
+		//keine stepDuration und aktueller Slide hat ein Video => der weitere 
+		//step wird durch ein event aus dem player ausgelöst
+			var videoElem = rootSlides[curSlideIdx].querySelector("video");
+			if(videoElem == null){
+				//kein video und keine duration eingestellt => nächster step nach defaultDuration 
+				nextSlideStepTimeout = setTimeout(nextSlideStep, defaultStepDuration * 1000);
+			}
+		}
 	}
-	
-	
 }
 
 function initDataFragments(){

@@ -26,7 +26,8 @@ body{
 }
 
 body.raspberryMode video{
-	display: none;
+	/* override settings from detail-slide-layout */
+	display: none !important; 
 }
 
 
@@ -157,6 +158,7 @@ h2{
 .center{
 	text-align: center;
 	display: block;
+	float: none !important;
 }
 
 .neighbors > *:last-child{
