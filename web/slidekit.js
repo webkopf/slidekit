@@ -4,15 +4,23 @@ var curSlideIdx;
 var autoplay = false;
 var nextSlideStepTimeout;
 
-
 var hash = location.hash.substr(1);
+
+if(hash.indexOf('@debug') != -1){
+	var debugDiv = document.createElement("div");
+	debugDiv.id = "debugDiv";
+	debugDiv.innerHTML = 
+		"innerWidth: " + window.innerWidth + "<br>" +
+		"innerHeight: " + window.innerHeight;
+	document.body.appendChild(debugDiv);
+}
+
 if(hash == "autoplay"){
 	curSlideIdx = 0;
 	autoplay = true;
 	var durationAttr = rootSlides[curSlideIdx].getAttribute("data-duration")
 	var duration = parseInt(durationAttr) | defaultStepDuration;	
-	nextSlideStepTimeout = setTimeout(nextSlideStep, duration * 1000);
-	
+	nextSlideStepTimeout = setTimeout(nextSlideStep, duration * 1000);	
 }
 else{
 	curSlideIdx = parseInt(location.hash.substr(1)) | 0;	

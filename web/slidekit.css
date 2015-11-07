@@ -181,3 +181,13 @@ h2{
 	height: 100%;
 	z-index: -1;
 }
+
+#debugDiv{
+	font-size: 12px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	background: #ddd;
+	padding: 10px;
+}
