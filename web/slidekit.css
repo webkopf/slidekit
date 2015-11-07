@@ -158,7 +158,7 @@ h2{
 .center{
 	text-align: center;
 	display: block;
-	float: none !important;
+	float: none;
 }
 
 .neighbors > *:last-child{
