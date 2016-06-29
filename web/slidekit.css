@@ -65,13 +65,11 @@ body.raspberryMode video{
 }
 
 #slides > section.active{
-	display: -webkit-flex;
-	display: flex;	
+	display: block;	
 }
 
 #slides > section.active + section{
-	display: -webkit-flex;
-	display: flex;
+	display: block;
 	left: 100%;
 }
 

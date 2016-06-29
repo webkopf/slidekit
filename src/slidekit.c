@@ -28,14 +28,13 @@
 
 #include "utils.h"
 
-static gboolean javascript = false;
 static gboolean private_browsing = true;
 static gboolean experimental = false;
 static gboolean full_zoom = false;
 static gboolean page_cache = false;
 static gboolean no_autoplay = false;
 static gboolean smooth_scrolling = false;
-static gboolean fullscreen_enabled = true;
+static gboolean fullscreen_enabled = false;
 
 char htmlFilePath[4096];
 char* basePath;
@@ -100,7 +99,7 @@ long determineRemainingMilliSecs(char* omx_status_string){
 
 static void play_active_video() {
 
-//#define OMX_DISABLED
+#define OMX_DISABLED
 #ifndef OMX_DISABLED
 	WebKitDOMDocument* domDocument = webkit_web_view_get_dom_document(web_view);
 
